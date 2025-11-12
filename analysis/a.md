@@ -26,10 +26,15 @@ This document supplements the paper “How To Cook The Fragmented Rug Pull?” (
 References
 
 [1] CertiK Report, August 2022: http://www.certik.com/resources/blog/august-stats-graph-2022
+
 [2] CertiK Report, November 2022: http://www.certik.com/resources/blog/november-stats-graph-2022
+
 [3] CertiK Report, December 2022: http://www.certik.com/resources/blog/december-stats-graph-2022
+
 [4] CertiK Report, June 2024: http://www.certik.com/resources/blog/june-stats-graph-2023
+
 [5] CertiK Report, October 2023: http://www.certik.com/resources/blog/october-stats-graph-2023
+
 [6] CertiK Report, May 2023: http://www.certik.com/resources/blog/aug-stats-graph-2022
 [7] CertiK Report, February 2022: http://www.certik.com/resources/blog/february-stats-graph-2023
 [8] Binance FSL, October 2023: https://www.binance.com/en/square/post/10-23-2023-certik-identifies-1-6m-exit-scam-involving-fsl-token-linked-to-scf-finance-1463156
