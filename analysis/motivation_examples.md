@@ -1,7 +1,5 @@
 This document supplements the paper “How To Cook The Fragmented Rug Pull?” (2025) by providing additional real-world cases analyzed during our motivation example.
 
-
-
 | No. | Token Name   | Pool Address      | Report Reference                                           |
 | :-: | :----------- | :---------------------- | :----------------------------------------------------------- |
 |  1  | **Sudorare**    | `0x5...2AE`   |       [1]      |
@@ -23,23 +21,26 @@ This document supplements the paper “How To Cook The Fragmented Rug Pull?” (
 |  17  | **SMURT** | `0x0...92d`   |      [4]       |
 |  18  | **PEPECOIN** | `0x1...561`   |      [13]       |
 
+
+Some of the reports only mention token names but not their contract addresses. To ensure that they correspond to the exact tokens we analyzed in our motivation study (but not just the same-name token), we cross-verified each case using on-chain economic evidence. In specific, we first filter the LPs containing the same paired-token name to the report, comparing the timeline of it's creation corresponding to the report, and then calculate the estimate profit using the trick of withdraw/inflated sellings from addressed in those LPs by it's history to comparing the reported loss amount in the report with the given timeline. The example is chosen if only it matched with the report timeline and profit (and being the only pools with the same paired-token name/timeline/profit to the report). This profit–time correspondence provides strong confidence that the reports reference the same token instances underlying our analysis.
+
 References
 
-[1] CertiK Report, August 2022: http://www.certik.com/resources/blog/august-stats-graph-2022
+[1] CertiK Report, August 2022: http://certik.com/resources/blog/august-stats-graph-2022
 
-[2] CertiK Report, November 2022: http://www.certik.com/resources/blog/november-stats-graph-2022
+[2] CertiK Report, November 2022: http://certik.com/resources/blog/november-stats-graph-2022
 
-[3] CertiK Report, December 2022: http://www.certik.com/resources/blog/december-stats-graph-2022
+[3] CertiK Report, December 2022: http://certik.com/resources/blog/december-stats-graph-2022
 
-[4] CertiK Report, June 2024: http://www.certik.com/resources/blog/june-stats-graph-2023
+[4] CertiK Report, June 2024: http://certik.com/resources/blog/june-stats-graph-2023
 
-[5] CertiK Report, October 2023: http://www.certik.com/resources/blog/october-stats-graph-2023
+[5] CertiK Report, October 2023: http://certik.com/resources/blog/october-stats-graph-2023
 
-[6] CertiK Report, May 2023: http://www.certik.com/resources/blog/aug-stats-graph-2022
+[6] CertiK Report, May 2023: http://certik.com/resources/blog/aug-stats-graph-2022
 
-[7] CertiK Report, February 2022: http://www.certik.com/resources/blog/february-stats-graph-2023
+[7] CertiK Report, February 2022: http://certik.com/resources/blog/february-stats-graph-2023
 
-[8] Binance FSL, October 2023: https://www.binance.com/en/square/post/10-23-2023-certik-identifies-1-6m-exit-scam-involving-fsl-token-linked-to-scf-finance-1463156
+[8] Binance FSL, October 2023: https://binance.com/en/square/post/10-23-2023-certik-identifies-1-6m-exit-scam-involving-fsl-token-linked-to-scf-finance-1463156
 
 [9] CertiK Report, October 2024: https://x.com/CertiKAlert/status/1852311698549416062
 
@@ -49,7 +50,7 @@ References
 
 [12] CertiK Report, June 2024: https://x.com/CertiKAlert/status/1807368986880803096
 
-[13] CertiK Report, August 2023: https://www.certik.com/resources/blog/august-stats-graph-2023
+[13] CertiK Report, August 2023: https://certik.com/resources/blog/august-stats-graph-2023
 
 
 
