@@ -15,42 +15,33 @@ The pipeline follows the four stages described in the paper:
 
 ## Requirements
 
-- **Ethereum node:** Geth (Go Ethereum), run as an **archive** node
-  (the measurement reaches back to 2018 and requires historical state).
-- **Python:** 3.8+ with `web3.py`, `pandas`, `numpy`, `matplotlib`,
-  `jupyter`, `tqdm`.
-- **System:** ~1 TB disk (SSD recommended), stable internet for syncing.
-
-```bash
-pip install -r requirements.txt
-```
+- **Ethereum node:** Geth (Go Ethereum).
+- **Python:** 3.8+ with `web3.py`, `pandas`, `matplotlib`, `numpy`.
+- **System:** ~1 TB disk space, SSD recommended, stable internet.
 
 ---
 
-## Stage 1 — Raw Ethereum data collection
+## Raw Ethereum data collection
 
 The collection scaffolding is forked and extended from
 [this guide](https://medium.com/@victor.denisov/how-to-retrieve-data-from-the-ethereum-blockchain-386b03bea4a)
 ([source repo](https://github.com/grgcmz/eth-data-analysis)).
 
-**Step 1.** Install and sync Geth as an archive node:
+**Step 1.** Install and sync Geth to query historical blocks:
 
 ```bash
-geth --syncmode "full" --gcmode "archive" \
-     --http --http.api "eth,net,web3"
+geth --syncmode "fast" --http --http.api "eth,net,web3"
 ```
 
 **Step 2.** Pull all transactions in the target block range using `web3.py`.
 Because of memory and storage constraints, we iterate in small batches
-(default 5 blocks at a time):
+(e.g. 5 blocks at a time):
 
 ```python
 from web3 import Web3
-w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-
-for block in range(6_627_000, 21_379_911):
-    block_data = w3.eth.get_block(block, full_transactions=True)
-    # ... persist batch to disk
+web3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
+for block in range(6627000, 21379910):
+    block_data = web3.eth.getBlock(block, full_transactions=True)
 ```
 
 **Step 3.** Anonymize public addresses with
@@ -59,12 +50,11 @@ data is public, but we mask the middle bytes of each wallet/token address
 to avoid amplifying scammer attribution beyond what the analysis requires
 (see *Ethical Considerations* in the paper).
 
-**Step 4.** Persist the anonymized dataset to local storage for downstream
-stages.
+**Step 4.** Store the data in the database for downstream stages.
 
 ---
 
-## Stage 2 — DEX transaction filtering
+## DEX transaction filtering
 
 To restrict the corpus to DEX activity, each transaction hash is queried
 against the **Chainalysis / Transpose API**
@@ -83,79 +73,59 @@ Table 1 of the paper.
 
 ---
 
-## Stage 3 — FRP labeling
+## FRP labeling
 
-The labeling step applies the formal FRP definition (Definition 2, §4.3)
-to the collected pool set.
+FRP labeling follows the formal definition in the paper (Definition 2,
+§4.3), which rests on the three atomic predicates from §4.1:
 
-**Pool filtering.** We retain only LPs whose observable lifetime
-(first to last on-chain activity) is at most 100 days, as motivated in §7.4.
-This reduces 384,029 LPs to **303,614** short-lived LPs.
-
-**Predicate evaluation.** For each remaining pool, we evaluate the three
-atomic predicates from §4.1:
-
-- **(A) `RetainLP`** — the deployer's initial LP tokens are not burned or
+- **(A) `RetainLP`** - the deployer's initial LP tokens are not burned or
   time-locked.
-- **(B) `Impact`** — every inflated sell satisfies `v_i / V_i ≤ θ`, with
+- **(B) `Impact`** - every inflated sell satisfies `v_i / V_i ≤ θ`, with
   `θ = 0.9` (matching prior work).
-- **(C) `SellerIsOwner`** — either no owner-originated sell exists, or
+- **(C) `SellerIsOwner`** - either no owner-originated sell exists, or
   every owner-originated sell stays sub-threshold.
 
-A pool is labeled FRP iff (A) holds and (B), (C) jointly hold across the
-inflated-selling trace. Applying this rule to the 303,614 short-lived LPs
-yields the **105,434 FRP-labeled pools** released in
-[`analysis/labeled_pool_anonimized.json`](./analysis/labeled_pool_anonimized.json).
-
-**Validation.** Two checks accompany the labeled set:
-
-- A random sample of 200 flagged pools was manually verified to satisfy
-  all three predicates (results in `analysis/manual_inspection_200.csv`).
-- The canonical rug-pull heuristics from prior work [3, 5] were
-  re-implemented and applied to the 105,434 FRP pools; none were detected
-  by the canonical rules, confirming that FRP cases are structurally
-  distinct from classical rug pulls and not double-counted.
+These predicates, together with the ≤100-day lifetime filter (§7.4), are
+encoded directly in the SQL queries used during Stage 2 - primarily in
+[`dex_transactions/getpool_sql.tex`](./dex_transactions/getpool_sql.tex) -
+so that pool selection, predicate evaluation, and FRP labeling are
+performed in a single pass over the indexed transaction data rather than
+as a separate downstream step. The query returns the **105,434
+FRP-labeled pools** released in
+[`analysis/labeled_pool_anonimized.json`](./analysis/labeled_pool_anonimized.json),
+filtered from the **303,614** short-lived pools in the underlying corpus
+of **384,029** collected LPs.
 
 ---
 
-## Stage 4 — Measurement and analysis
+## Measurement and analysis
 
 The measurement code is in [`analysis/`](./analysis), implemented as a mix
 of Python scripts (`python3 filename.py`) and Jupyter notebooks (run
-cell-by-cell). It corresponds directly to Algorithm 1 in Appendix D and
-covers three perspectives:
+cell-by-cell). It corresponds to Algorithm 1 in Appendix D and covers
+three perspectives:
 
-- **Actor-centric analysis (§6.1)** — wallet-count distribution, owner
+- **Actor-centric analysis (§6.1)** - wallet-count distribution, owner
   involvement over time, and recurrent inflated-seller wallets. Reproduces
   Figure 3.
-- **Action-centric analysis (§6.2)** — first-sell delay, sell span, and
+- **Action-centric analysis (§6.2)** - first-sell delay, sell span, and
   inflated-sell counts, stratified by single/multi-wallet and
   owner/non-owner cohorts. Reproduces Table 2.
-- **Behavior categorization (§6.3)** — binning pools by wallet count and
+- **Behavior categorization (§6.3)** - binning pools by wallet count and
   total sell count, identifying the three dominant clusters
   (Minimal Drains, Moderate Networks, Distributed Campaigns). Reproduces
   Figures 4–5 and Table 3.
 
-All notebooks read `analysis/labeled_pool_anonimized.json` and write
-figures to `analysis/figures/`.
+Extended motivation case studies referenced in §3 are provided in
+[`analysis/motivation_examples.md`](./analysis/motivation_examples.md).
 
 ---
 
-## Released vs. not released
+## What is and isn't released
 
-We release the labeled FRP dataset, all per-pool transaction traces for the
-105,434 flagged pools (34.19 M transactions), the predicate and labeling
-code, the baseline cross-check, and the analysis notebooks.
-
-The full raw corpus underlying Stage 1 — approximately **1.1 billion**
-Ethereum transactions — exceeds the size limits of anonymous hosting and
-is not bundled here. It can be reconstructed deterministically from any
-Ethereum archive node using the block range and DEX contract addresses
-listed above.
-
----
-
-## License
-
-Released under the MIT License (see `LICENSE`). Datasets are derived from
-public Ethereum on-chain data and are similarly unrestricted.
+We release the labeled FRP dataset, the labeling and analysis code, and
+the analysis notebooks. The full raw transaction corpus collected in
+Stage 1 - approximately **1.1 billion** Ethereum transactions - exceeds
+the practical size limits of anonymous hosting and is not bundled here.
+It can be reconstructed from any Ethereum archive node using the block
+range and DEX list above.
