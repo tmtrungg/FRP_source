@@ -1,7 +1,7 @@
-# How To Cook The Fragmented Rug Pull?
+# How To Detect The Fragmented Rug Pull?
 ## OVERVIEW
 
-This repository implements the code and data analytics pipeline described in the paper *"How To Cook The Fragmented Rug Pull?"*. The primary goal is to identify and analyze the **FRP** scam, a newly defined type of fraudulent activity in decentralized finance (DeFi). We use data from Ethereum blocks **6,627,000 (November 2, 2018)** to **21,379,910 (March 5, 2025)**, covering the lifespan of DeFi liquidity pools. Our study analyzes data of FRP LPs extracted from the six largest decentralized exchanges (DEXs) on Ethereum.
+This repository implements the code and data analytics pipeline described in the paper *"How To Detect The Fragmented Rug Pull?"*. The primary goal is to identify and analyze the **FRP** scam, a newly defined type of fraudulent activity in decentralized finance (DeFi). We use data from Ethereum blocks **6,627,000 (November 2, 2018)** to **21,379,910 (March 5, 2025)**, covering the lifespan of DeFi liquidity pools. Our study analyzes data of FRP LPs extracted from the six largest decentralized exchanges (DEXs) on Ethereum.
 
 ## RAW ETHEREUM DATA COLLECTION
 
